@@ -32,6 +32,7 @@ public class AcctManager extends HttpServlet {
 
 	protected void acctQuery(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("start query method...");
 		String acctNo = request.getParameter("acctNo");
 		String acctName = request.getParameter("acctName");
 		String acctStatus = request.getParameter("acctStatus");
@@ -126,6 +127,8 @@ public class AcctManager extends HttpServlet {
 
 	protected void acctDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("start delete method...");
+
 		String acctNo = request.getParameter("acctno");
 		if (acctNo == null) {
 			request.getRequestDispatcher("AcctMain.jsp").forward(request, response);
@@ -180,6 +183,8 @@ public class AcctManager extends HttpServlet {
 
 	protected void acctAdd(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("start add method...");
+
 		String acctNo = request.getParameter("acctno");
 		String acctName = request.getParameter("acctname");
 		String acctStatus = request.getParameter("acctstatus");
@@ -243,6 +248,8 @@ public class AcctManager extends HttpServlet {
 
 	protected void acctEdit(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("start edit method...");
+
 		String acctNo = request.getParameter("acctno");
 		String acctName = request.getParameter("acctname");
 		String acctStatus = request.getParameter("acctstatus");
@@ -298,36 +305,6 @@ public class AcctManager extends HttpServlet {
 		}
 	}
 
-	// login
-	private void acctLogin(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");
-		System.out.println("enter acctLogin1");
-		// 把用户名和密码保存在Cookie对象里面
-		String username = URLEncoder.encode(request.getParameter("userName"), "utf-8");
-		String password = URLEncoder.encode(request.getParameter("password"), "utf-8");
-
-		Cookie usernameCookie = new Cookie("username", username);
-		Cookie passwordCookie = new Cookie("password", password);
-		usernameCookie.setMaxAge(24 * 60 * 60);
-		passwordCookie.setMaxAge(24 * 60 * 60);
-		response.addCookie(usernameCookie);
-		response.addCookie(passwordCookie);
-
-		System.out.println("enter acctLogin2");
-		// String acct_name = request.getParameter("userName");
-		// String acct_pwd = request.getParameter("password");
-
-		System.out.println("enter acctLogin3");
-		if (username.equals("张三") && password.equals("111111")) {
-			request.setAttribute("success", "Successfully login.");
-			request.getRequestDispatcher("LoginDone.jsp").forward(request, response);
-			System.out.println("Successfully login.");
-		} else {
-			request.getRequestDispatcher("Error.jsp").forward(request, response);
-		}
-	}
-
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		System.out.println("doGet");
@@ -340,12 +317,16 @@ public class AcctManager extends HttpServlet {
 		}
 		if (oper.equals("query")) {
 			acctQuery(request, response);
+			System.out.println("out query method...");
 		} else if (oper.equals("delete")) {
 			acctDelete(request, response);
+			System.out.println("out delete method...");
 		} else if (oper.equals("add")) {
 			acctAdd(request, response);
+			System.out.println("out add method...");
 		} else if (oper.equals("edit")) {
 			acctEdit(request, response);
+			System.out.println("out edit method...");
 		} else {
 			System.out.println("Invalid operation.");
 		}
@@ -360,5 +341,4 @@ public class AcctManager extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
 }

@@ -1,7 +1,6 @@
 package servlet;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 
 import javax.servlet.ServletException;
@@ -21,12 +20,11 @@ public class Login extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		try {
-			request.setCharacterEncoding("utf-8");
-			response.setContentType("text/html;charset=utf-8");
-		} catch (UnsupportedEncodingException el) {
-			el.printStackTrace();
-		}
+		/*
+		 * try { request.setCharacterEncoding("utf-8");
+		 * response.setContentType("text/html;charset=utf-8"); } catch
+		 * (UnsupportedEncodingException el) { el.printStackTrace(); }
+		 */
 
 		// 1.取得登录参数
 		String userName = request.getParameter("userName");

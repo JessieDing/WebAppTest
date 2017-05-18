@@ -3,6 +3,7 @@
 	pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -28,6 +29,9 @@
 			if (isLogin == null || (!isLogin.equals("true"))) {
 				response.sendRedirect("Login.jsp");//跳转到登录页面
 			}
+		%>
+		<%-- 	<%
+			
 
 		
 			Cookie[] cs = request.getCookies();
@@ -44,12 +48,12 @@
 					}
 				}
 			}
-		%>
-		<h3>
+		%> --%>
+		<%-- <h3>
 			用户名：<%=loginName%></h3>
 		<h3>
 			查询数：<%=acctNum%></h3>
-		
+		 --%>
 	</form>
 	<%
 		List<String> accts = (ArrayList<String>) request.getAttribute("accts");
