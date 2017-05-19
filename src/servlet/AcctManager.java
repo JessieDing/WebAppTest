@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import beans.Acct;
 import db.DBOper;
 
 /**
@@ -36,6 +37,22 @@ public class AcctManager extends HttpServlet {
 		String acctNo = request.getParameter("acctNo");
 		String acctName = request.getParameter("acctName");
 		String acctStatus = request.getParameter("acctStatus");
+
+		// 分页参数
+		int currPage = 1;// 当前页码，从前台传过来
+		int pageNum = 1;// 总共有多少页，统计满足条件的笔数计算而来
+		int numPerPage = 5;// 每页有多少笔：暂时固定，也可以从前台传过来
+		int countNum = 0;// 总笔数
+		int startIndex = 0;
+		String pageFlag = "";// 是否分页
+		String strCurrPage = request.getParameter("currPage");
+		if (strCurrPage != null) {
+			currPage = Integer.parseInt(strCurrPage);
+			startIndex = (currPage - 1) * numPerPage;// 计算从第几行开始
+		}
+		if (request.getParameter("pageFlag") != null) {
+			pageFlag = request.getParameter("pageFlag");
+		}
 
 		// 参数有效性检查
 		if (acctNo == null) {
@@ -80,6 +97,12 @@ public class AcctManager extends HttpServlet {
 
 		System.out.println("sql[" + sql + "]");
 
+		// 查询分页处理
+		if (strCurrPage != null && !strCurrPage.equals("") && pageFlag.equals("1")) {
+			sql += " limit " + startIndex + "," + numPerPage;
+		}
+		System.out.println("sql[" + sql + "]");
+
 		// 3.执行查询，并将查询结果返回（把结果放到response对象里）
 		List<String> accts = new ArrayList<String>();
 		DBOper dbOper = new DBOper();
@@ -91,13 +114,36 @@ public class AcctManager extends HttpServlet {
 					String no = resultSet.getString("acctNo");
 					String name = resultSet.getString("acctName");
 					String status = resultSet.getString("acctStatus");
-					String balance = resultSet.getString("balance");
+					double balance = Double.parseDouble(resultSet.getString("balance"));
 					String idType = resultSet.getString("IdType");
 					String idNo = resultSet.getString("IdNo");
 					String email = resultSet.getString("Email");
 					String acctInfo = no + "," + name + "," + status + "," + balance + "," + idType + "," + idNo + ","
 							+ email;
+
+					Acct acct = new Acct(no, name, status, balance, idType, idNo, email);
 					accts.add(acctInfo);
+				}
+
+				// 单独统计符合条件的笔数
+				String sqlCount = "select count(*) from acct ";
+				int tmpIndex = sql.indexOf("where");
+				if (tmpIndex > 0) {
+					sqlCount += sql.substring(tmpIndex);
+				}
+				System.out.println(sqlCount);
+
+				ResultSet rs2 = dbOper.doQuery(sqlCount);
+				if (rs2.next()) {
+					countNum = rs2.getInt(1);
+				}
+
+				// 计算总页数
+				pageNum = countNum / numPerPage;
+				System.out.println("pageNum:" + pageNum);
+				int tmp2 = countNum % numPerPage;// 求余
+				if (tmp2 > 0) {
+					pageNum++;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -107,9 +153,22 @@ public class AcctManager extends HttpServlet {
 		}
 		// dbOper.closeConnection();
 
+		// 回传分页信息给客户端
+		System.out.println("PageNum:" + pageNum);
+		System.out.println("CountNum:" + countNum);
+		System.out.println("NumPerPage:" + numPerPage);
+		System.out.println("currPage:" + currPage);
+
+		if (pageFlag.equals("1")) {
+			request.setAttribute("pageNum", pageNum);
+			request.setAttribute("countNum", countNum);
+			request.setAttribute("numPerPage", numPerPage);
+			request.setAttribute("currPage", currPage);
+		}
+
 		request.setAttribute("accts", accts);// 将账户集合放入accts参数
-		for (String tmp : accts) {
-			System.out.println(tmp);
+		for (String s : accts) {
+			System.out.println(s);
 		}
 
 		// 添加Cookie项

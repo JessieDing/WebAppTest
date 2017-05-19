@@ -3,7 +3,7 @@
 	pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -11,29 +11,32 @@
 <title>账号管理</title>
 </head>
 <body>
-	<form action="acctManager?oper=query" method="post">
+	<%
+		String currPage = "1";
+	%>
+	<%
+		//检查是否登录，未登录时一律跳转至登录页面。
+		Object o = session.getAttribute("isLogin");
+		String isLogin = "";
+		if (o != null) {
+			isLogin = (String) o;
+		}
+
+		if (isLogin == null || (!isLogin.equals("true"))) {
+			response.sendRedirect("Login.jsp");//跳转到登录页面
+		}
+	%>
+
+	<form action="acctManager?oper=query&pageFlag=1&currPage=<%=currPage%>"
+		method="post">
 		账号：<input type="text" name="acctNo" /><br> 户名：<input type="text"
 			name="acctName" /><br> 状态：<input type="text" name="acctStatus" /><br>
 		<input type="reset" value="重置"> <input type="submit"
 			value="查询"> <a href="AcctNew.jsp">添加</a> <br> <br>
 		<input type="button"
 			onclick="javascript:window.location.href='Login.jsp';" value="登录" />
+
 		<%
-			//检查是否登录，未登录时一律跳转至登录页面。
-			Object o = session.getAttribute("isLogin");
-			String isLogin = "";
-			if (o != null) {
-				isLogin = (String) o;
-			}
-
-			if (isLogin == null || (!isLogin.equals("true"))) {
-				response.sendRedirect("Login.jsp");//跳转到登录页面
-			}
-		%>
-		<%-- 	<%
-			
-
-		
 			Cookie[] cs = request.getCookies();
 			String acctNum = "";
 			String loginName = "";
@@ -48,18 +51,18 @@
 					}
 				}
 			}
-		%> --%>
+		%>
 		<%-- <h3>
 			用户名：<%=loginName%></h3>
 		<h3>
-			查询数：<%=acctNum%></h3>
-		 --%>
+			查询数：<%=acctNum%></h3> --%>
+
 	</form>
 	<%
 		List<String> accts = (ArrayList<String>) request.getAttribute("accts");
 		if (accts != null) {
 	%>
-	<table border="1px" width="400px">
+	<table width="800px" border="1px" cellspacing="0">
 		<tr>
 			<th>AcctNo</th>
 			<th>AcctName</th>
@@ -70,6 +73,8 @@
 			<th>Email</th>
 			<th>Operation</th>
 		</tr>
+
+
 		<%
 			for (String acctInfo : accts) {
 					String[] tmp = acctInfo.split(",");
@@ -89,6 +94,7 @@
 			<td><%=tIdType%></td>
 			<td><%=tIdNo%></td>
 			<td><%=tEmail%></td>
+
 			<%
 				StringBuffer strBuf = new StringBuffer();
 						strBuf.append("acctno=").append(tAcctNo);
@@ -99,7 +105,6 @@
 						strBuf.append("&idno=").append(tIdNo);
 						strBuf.append("&email=").append(tEmail);
 			%>
-
 			<td><a href="acctManager?oper=delete&acctno=<%=tAcctNo%>">Delete</a>
 				<a href="AcctEdit.jsp?<%=strBuf.toString()%>">Edit</a></td>
 
@@ -107,9 +112,24 @@
 		<%
 			}
 			} else {
-				System.out.println("It's null.");
+				System.out.println("accts is null.");
 			}
 		%>
+		<tr>
+			<td colspan=8>共${requestScope.pageNum}页
+				当前第${requestScope.currPage}页 <c:set var="pages"
+					value="${requestScope.pageNum == null ? 1 : requestScope.pageNum }" />
+				<c:forEach var="x" begin="1" end="${pages}" step="1">
+					<c:if test="${requestScope.currPage == x}">
+						<c:out value="${requestScope.currPage}" />
+					</c:if>
+
+					<c:if test="${requestScope.currPage != x}">
+						<a href="acctManager?oper=query&pageFlag=1&currPage=${x}">${x}</a>
+					</c:if>
+				</c:forEach>
+			</td>
+		</tr>
 
 	</table>
 </body>
